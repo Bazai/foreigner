@@ -37,6 +37,14 @@ module Foreigner
               when 'RESTRICT' then :restrict
             end
           end
+
+          if create_table_info =~ /CONSTRAINT #{quote_column_name(row['name'])} FOREIGN KEY .* REFERENCES .* ON UPDATE (CASCADE|SET NULL|RESTRICT)/
+            options[:update] = case $1
+              when 'CASCADE'  then :cascade
+              when 'SET NULL' then :nullify
+              when 'RESTRICT' then :restrict
+            end
+          end
           ForeignKeyDefinition.new(table_name, row['to_table'], options)
         end
       end
